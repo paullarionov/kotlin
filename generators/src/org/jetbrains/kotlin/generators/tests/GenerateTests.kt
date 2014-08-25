@@ -754,15 +754,20 @@ private class TestGroup(val testsRoot: String, val testDataRoot: String) {
                 testMethod: String = "doTest",
                 singleClass: Boolean = false,
                 testClassName: String? = null,
-                targetBackend: TargetBackend = TargetBackend.ANY
+                targetBackend: TargetBackend = TargetBackend.ANY,
+                excludeDirs: List<String> = listOf()
         ) {
             val rootFile = File(testDataRoot + "/" + relativeRootPath)
             val compiledPattern = Pattern.compile(pattern)
             val className = testClassName ?: TestGeneratorUtil.fileNameToJavaIdentifier(rootFile)
-            testModels.add(if (singleClass)
-                               SingleClassTestModel(rootFile, compiledPattern, testMethod, className, targetBackend)
-                           else
-                               SimpleTestClassModel(rootFile, recursive, excludeParentDirs, compiledPattern, testMethod, className, targetBackend))
+            testModels.add(
+                    if (singleClass)
+                        SingleClassTestModel(rootFile, compiledPattern, testMethod, className, targetBackend)
+                    else
+                        SimpleTestClassModel(
+                                rootFile, recursive, excludeParentDirs, compiledPattern, testMethod, className, targetBackend, excludeDirs
+                        )
+            )
         }
     }
 
