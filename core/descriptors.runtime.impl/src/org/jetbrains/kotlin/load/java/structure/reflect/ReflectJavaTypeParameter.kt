@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.load.java.structure.*
 import org.jetbrains.kotlin.name.Name
 import java.lang.reflect.TypeVariable
 import kotlin.properties.Delegates
+import java.lang.reflect.Method
 
 public class ReflectJavaTypeParameter(
         private val typeVariable: TypeVariable<*>
@@ -43,8 +44,13 @@ public class ReflectJavaTypeParameter(
     }
 
     override fun getOwner(): JavaTypeParameterListOwner? {
-        // TODO
-        throw UnsupportedOperationException()
+        val owner = typeVariable.getGenericDeclaration()
+        return when (owner) {
+            is Method -> ReflectJavaMethod(owner)
+            is Class<*> -> ReflectJavaClass(owner)
+            null -> null
+            else -> throw UnsupportedOperationException("Unsupported type parameter list owner (${owner.javaClass}): $owner")
+        }
     }
 
     override fun getType(): JavaType {
