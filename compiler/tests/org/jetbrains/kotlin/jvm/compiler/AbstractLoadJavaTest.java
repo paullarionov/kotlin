@@ -54,10 +54,7 @@ import org.junit.Assert;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static org.jetbrains.kotlin.jvm.compiler.LoadDescriptorUtil.*;
@@ -84,7 +81,8 @@ public abstract class AbstractLoadJavaTest extends TestCaseWithTmpdir {
 
         List<File> javaSources = FileUtil.findFilesByMask(Pattern.compile(".+\\.java"), sourcesDir);
         Pair<PackageViewDescriptor, BindingContext> binaryPackageAndContext = compileJavaAndLoadTestPackageAndBindingContextFromBinary(
-                javaSources, tmpdir, myTestRootDisposable, ConfigurationKind.JDK_ONLY);
+                javaSources, tmpdir, ConfigurationKind.JDK_ONLY
+        );
 
         checkJavaPackage(expectedFile, binaryPackageAndContext.first, binaryPackageAndContext.second, DONT_INCLUDE_METHODS_OF_OBJECT);
     }
@@ -112,7 +110,8 @@ public abstract class AbstractLoadJavaTest extends TestCaseWithTmpdir {
         Assert.assertEquals("test", packageFromSource.getName().asString());
 
         PackageViewDescriptor packageFromBinary = LoadDescriptorUtil.loadTestPackageAndBindingContextFromJavaRoot(
-                tmpdir, getTestRootDisposable(), configurationKind).first;
+                tmpdir, getTestRootDisposable(), TestJdkKind.MOCK_JDK, configurationKind
+        ).first;
 
         for (DeclarationDescriptor descriptor : packageFromBinary.getMemberScope().getAllDescriptors()) {
             if (descriptor instanceof ClassDescriptor) {
@@ -211,7 +210,8 @@ public abstract class AbstractLoadJavaTest extends TestCaseWithTmpdir {
         FileUtil.copy(originalJavaFile, new File(testPackageDir, originalJavaFile.getName()));
 
         Pair<PackageViewDescriptor, BindingContext> javaPackageAndContext = loadTestPackageAndBindingContextFromJavaRoot(
-                tmpdir, getTestRootDisposable(), ConfigurationKind.JDK_ONLY);
+                tmpdir, getTestRootDisposable(), TestJdkKind.MOCK_JDK, ConfigurationKind.JDK_ONLY
+        );
 
         checkJavaPackage(expectedFile, javaPackageAndContext.first, javaPackageAndContext.second,
                          DONT_INCLUDE_METHODS_OF_OBJECT.withValidationStrategy(errorTypesAllowed()));
@@ -244,9 +244,20 @@ public abstract class AbstractLoadJavaTest extends TestCaseWithTmpdir {
                 getTestRootDisposable(), ConfigurationKind.JDK_AND_ANNOTATIONS, TestJdkKind.MOCK_JDK);
 
         Pair<PackageViewDescriptor, BindingContext> javaPackageAndContext = compileJavaAndLoadTestPackageAndBindingContextFromBinary(
-                srcFiles, compiledDir, getTestRootDisposable(), ConfigurationKind.ALL);
+                srcFiles, compiledDir, ConfigurationKind.ALL
+        );
 
         checkJavaPackage(getTxtFile(javaFileName), javaPackageAndContext.first, javaPackageAndContext.second, configuration);
+    }
+
+    @NotNull
+    private Pair<PackageViewDescriptor, BindingContext> compileJavaAndLoadTestPackageAndBindingContextFromBinary(
+            @NotNull Collection<File> javaFiles,
+            @NotNull File outDir,
+            @NotNull ConfigurationKind configurationKind
+    ) throws IOException {
+        compileJavaWithAnnotationsJar(javaFiles, outDir);
+        return loadTestPackageAndBindingContextFromJavaRoot(outDir, myTestRootDisposable, TestJdkKind.MOCK_JDK, configurationKind);
     }
 
     private static void checkJavaPackage(

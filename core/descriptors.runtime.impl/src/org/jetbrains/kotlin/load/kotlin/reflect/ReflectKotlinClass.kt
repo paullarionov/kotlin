@@ -84,7 +84,7 @@ public class ReflectKotlinClass(private val klass: Class<*>) : KotlinJvmBinaryCl
         classHeader = header!!
     }
 
-    class NotAKotlinClass : RuntimeException()
+    public class NotAKotlinClass : RuntimeException()
 
     override fun getClassId(): ClassId = klass.classId
 

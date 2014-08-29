@@ -33,7 +33,7 @@ public class ReflectJavaClassifierType(val classifierType: Type) : ReflectJavaTy
 
     override fun getSubstitutor(): JavaTypeSubstitutor {
         // TODO
-        throw UnsupportedOperationException()
+        return JavaTypeSubstitutor.EMPTY
     }
 
     override fun getSupertypes(): Collection<JavaClassifierType> {

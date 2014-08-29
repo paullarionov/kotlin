@@ -247,6 +247,7 @@ fun main(args: Array<String>) {
 
         testClass(javaClass<AbstractJvmRuntimeDescriptorLoaderTest>()) {
             model("loadJava/compiledKotlin")
+            model("loadJava/compiledJava", extension = "java", excludeDirs = listOf("sam", "kotlinSignature/propagation"))
         }
 
         testClass(javaClass<AbstractCompileJavaAgainstKotlinTest>()) {
