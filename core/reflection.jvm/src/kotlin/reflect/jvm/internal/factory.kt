@@ -16,25 +16,23 @@
 
 package kotlin.reflect.jvm.internal
 
-import kotlin.reflect.*
-
 fun <T> kClass(jClass: Class<T>): KClassImpl<T> =
-        KClassImpl<T>(jClass, false)
+        KClassImpl(jClass)
 
 fun <T> kClassFromKotlin(jClass: Class<T>): KClassImpl<T> =
-        KClassImpl<T>(jClass, true)
+        KClassImpl(jClass, true)
 
 fun kPackage(jClass: Class<*>): KPackageImpl =
         KPackageImpl(jClass)
 
 fun topLevelVariable(name: String, owner: KPackageImpl): KTopLevelVariableImpl<Any?> =
-        KTopLevelVariableImpl<Any?>(name, owner)
+        KTopLevelVariableImpl(name, owner)
 
 fun mutableTopLevelVariable(name: String, owner: KPackageImpl): KMutableTopLevelVariableImpl<Any?> =
-        KMutableTopLevelVariableImpl<Any?>(name, owner)
+        KMutableTopLevelVariableImpl(name, owner)
 
 fun <T> topLevelExtensionProperty(name: String, owner: KPackageImpl, receiver: Class<T>): KTopLevelExtensionPropertyImpl<T, Any?> =
-        KTopLevelExtensionPropertyImpl<T, Any?>(name, owner, receiver)
+        KTopLevelExtensionPropertyImpl(name, owner, receiver)
 
 fun <T> mutableTopLevelExtensionProperty(name: String, owner: KPackageImpl, receiver: Class<T>): KMutableTopLevelExtensionPropertyImpl<T, Any?> =
-        KMutableTopLevelExtensionPropertyImpl<T, Any?>(name, owner, receiver)
+        KMutableTopLevelExtensionPropertyImpl(name, owner, receiver)

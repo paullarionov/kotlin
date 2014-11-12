@@ -68,7 +68,7 @@ public val Class<*>.kotlinPackage: KPackage
 public val Field.kotlin: KProperty<*>
     get() {
         val clazz = getDeclaringClass()
-        val name = getName()!!
+        val name = getName()
         val modifiers = getModifiers()
         val static = Modifier.isStatic(modifiers)
         val final = Modifier.isFinal(modifiers)
