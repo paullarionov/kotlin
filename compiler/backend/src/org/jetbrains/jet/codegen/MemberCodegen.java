@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.codegen.context.ClassContext;
 import org.jetbrains.jet.codegen.context.CodegenContext;
 import org.jetbrains.jet.codegen.context.FieldOwnerContext;
+import org.jetbrains.jet.codegen.inline.FileMapping;
 import org.jetbrains.jet.codegen.inline.InlineCodegenUtil;
 import org.jetbrains.jet.codegen.inline.NameGenerator;
 import org.jetbrains.jet.codegen.inline.ReifiedTypeParametersUsages;
@@ -387,5 +388,9 @@ public abstract class MemberCodegen<T extends JetElement/* TODO: & JetDeclaratio
     @NotNull
     public ReifiedTypeParametersUsages getReifiedTypeParametersUsages() {
         return reifiedTypeParametersUsages;
+    }
+
+    public void addSMAP(FileMapping fm) {
+        v.addSMAP(fm);
     }
 }
