@@ -20,6 +20,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jet.backend.common.CodegenUtil;
 import org.jetbrains.jet.codegen.*;
 import org.jetbrains.jet.codegen.binding.CodegenBinding;
 import org.jetbrains.jet.codegen.context.CodegenContext;
@@ -160,6 +161,8 @@ public class InlineCodegen extends CallGenerator {
             asmMethod = jvmSignature.getAsmMethod();
         }
 
+        Integer lineNumbers = CodegenUtil.getLineNumberForElement(callElement.getContainingFile(), true);
+        assert lineNumbers != null : "Couldn't extract line count in " + callElement.getContainingFile();
 
         MethodNode node;
         if (functionDescriptor instanceof DeserializedSimpleFunctionDescriptor) {
@@ -170,7 +173,7 @@ public class InlineCodegen extends CallGenerator {
                 throw new RuntimeException("Couldn't obtain compiled function body for " + descriptorName(functionDescriptor));
             }
 
-            sourceMapper = new SourceMapper(callElement.getContainingFile().getTextLength());
+            sourceMapper = new SourceMapper(lineNumbers);
             sourceMapper.visitSource(((SMAPMethodNode) node).getSource());
         }
         else {
@@ -181,7 +184,7 @@ public class InlineCodegen extends CallGenerator {
                 throw new RuntimeException("Couldn't find declaration for function " + descriptorName(functionDescriptor));
             }
 
-            sourceMapper = new SourceMapper(element.getContainingFile().getTextLength());
+            sourceMapper = new SourceMapper(lineNumbers);
             sourceMapper.visitSource(element.getContainingFile().getName());
 
             node = new MethodNode(InlineCodegenUtil.API,
