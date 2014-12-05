@@ -18,9 +18,10 @@ package org.jetbrains.jet.codegen.inline
 
 import org.jetbrains.org.objectweb.asm.tree.MethodNode
 import org.jetbrains.org.objectweb.asm.Opcodes
+import kotlin.properties.Delegates
 
-public class SMAPMethodNode(access: Int, name: String, desc: String, signature: String, exceptions: Array<String>?,
-                            val source: String,
-                            val debugger: String) :
-        MethodNode(InlineCodegenUtil.API, access, name, desc, signature, exceptions) {
+public class SMAPAndMethodNode(val node: MethodNode, val source: String, val smap: SMAP) {
+
+
 }
+
