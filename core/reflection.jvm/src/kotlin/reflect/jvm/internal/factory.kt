@@ -16,11 +16,10 @@
 
 package kotlin.reflect.jvm.internal
 
+// TODO: drop these functions, use ReflectionFactory instead
+
 fun <T> kClass(jClass: Class<T>): KClassImpl<T> =
         KClassImpl(jClass)
-
-fun <T> kClassFromKotlin(jClass: Class<T>): KClassImpl<T> =
-        KClassImpl(jClass, true)
 
 fun kPackage(jClass: Class<*>): KPackageImpl =
         KPackageImpl(jClass)
