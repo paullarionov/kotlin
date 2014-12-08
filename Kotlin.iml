@@ -24,6 +24,7 @@
       <excludeFolder url="file://$MODULE_DIR$/libraries/stdlib/target" />
       <excludeFolder url="file://$MODULE_DIR$/libraries/stdlib/validator/target" />
       <excludeFolder url="file://$MODULE_DIR$/libraries/tools/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/libraries/tools/builtins/target" />
       <excludeFolder url="file://$MODULE_DIR$/libraries/tools/kdoc-maven-plugin/target" />
       <excludeFolder url="file://$MODULE_DIR$/libraries/tools/kdoc/target" />
       <excludeFolder url="file://$MODULE_DIR$/libraries/tools/kotlin-compiler/target" />
@@ -40,7 +41,6 @@
       <excludeFolder url="file://$MODULE_DIR$/libraries/tools/kotlin-maven-plugin/local-repo" />
       <excludeFolder url="file://$MODULE_DIR$/libraries/tools/kotlin-maven-plugin/target" />
       <excludeFolder url="file://$MODULE_DIR$/libraries/tools/kotlin-stdlib-gen/target" />
-      <excludeFolder url="file://$MODULE_DIR$/libraries/tools/runtime/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
