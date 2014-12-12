@@ -36,9 +36,11 @@ import org.jetbrains.jet.lang.resolve.DescriptorToSourceUtils;
 import org.jetbrains.jet.lang.resolve.DescriptorUtils;
 import org.jetbrains.jet.lang.resolve.calls.model.ResolvedCall;
 import org.jetbrains.jet.lang.resolve.java.AsmTypeConstants;
+import org.jetbrains.jet.lang.resolve.java.JvmClassName;
 import org.jetbrains.jet.lang.resolve.java.jvmSignature.JvmMethodParameterKind;
 import org.jetbrains.jet.lang.resolve.java.jvmSignature.JvmMethodParameterSignature;
 import org.jetbrains.jet.lang.resolve.java.jvmSignature.JvmMethodSignature;
+import org.jetbrains.jet.lang.resolve.name.ClassId;
 import org.jetbrains.jet.lang.types.lang.InlineStrategy;
 import org.jetbrains.jet.lang.types.lang.InlineUtil;
 import org.jetbrains.jet.renderer.DescriptorRenderer;
@@ -169,8 +171,12 @@ public class InlineCodegen extends CallGenerator {
 
         SMAPAndMethodNode nodeAndSMAP;
         if (functionDescriptor instanceof DeserializedSimpleFunctionDescriptor) {
-            VirtualFile file = InlineCodegenUtil.getVirtualFileForCallable((DeserializedSimpleFunctionDescriptor) functionDescriptor, state);
-            nodeAndSMAP = InlineCodegenUtil.getMethodNode(file.contentsToByteArray(), asmMethod.getName(), asmMethod.getDescriptor());
+            ClassId containerClassId = InlineCodegenUtil.getContainerClassIdForInlineCallable(
+                    (DeserializedSimpleFunctionDescriptor) functionDescriptor);
+
+            VirtualFile file = InlineCodegenUtil.getVirtualFileForCallable(containerClassId, state);
+            nodeAndSMAP = InlineCodegenUtil.getMethodNode(file.contentsToByteArray(), asmMethod.getName(), asmMethod.getDescriptor(),
+                                                          JvmClassName.byClassId(containerClassId).getInternalName());
 
             if (nodeAndSMAP == null) {
                 throw new RuntimeException("Couldn't obtain compiled function body for " + descriptorName(functionDescriptor));
