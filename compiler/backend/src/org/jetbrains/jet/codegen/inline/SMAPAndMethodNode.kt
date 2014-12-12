@@ -20,7 +20,7 @@ import org.jetbrains.org.objectweb.asm.tree.MethodNode
 import org.jetbrains.org.objectweb.asm.Opcodes
 import kotlin.properties.Delegates
 
-public class SMAPAndMethodNode(val node: MethodNode, val source: String, val smap: SMAP) {
+public class SMAPAndMethodNode(val node: MethodNode, val source: String, val sourcePath: String, val smap: SMAP) {
 
 
 }

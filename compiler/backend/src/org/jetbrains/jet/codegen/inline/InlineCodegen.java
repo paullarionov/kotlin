@@ -18,6 +18,7 @@ package org.jetbrains.jet.codegen.inline;
 
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.backend.common.CodegenUtil;
@@ -112,7 +113,7 @@ public class InlineCodegen extends CallGenerator {
         Integer lineNumbers = CodegenUtil.getLineNumberForElement(callElement.getContainingFile(), true);
         assert lineNumbers != null : "Couldn't extract line count in " + callElement.getContainingFile();
 
-        sourceMapper = new SourceMapper(lineNumbers);
+        sourceMapper = codegen.getParentCodegen().getSourceMapper();
     }
 
     @Override
@@ -208,7 +209,8 @@ public class InlineCodegen extends CallGenerator {
                 smap = generateMethodBody(maxCalcAdapter, functionDescriptor, methodContext, (JetDeclarationWithBody) element,
                                                jvmSignature);
             }
-            nodeAndSMAP = new SMAPAndMethodNode(node, element.getContainingFile().getName(), smap);
+            PsiFile file = element.getContainingFile();
+            nodeAndSMAP = new SMAPAndMethodNode(node, file.getName(), file.getVirtualFile().getPath(),  smap);
             maxCalcAdapter.visitMaxs(-1, -1);
             maxCalcAdapter.visitEnd();
         }
@@ -216,7 +218,7 @@ public class InlineCodegen extends CallGenerator {
     }
 
     private InlineResult inlineCall(SMAPAndMethodNode nodeAndSmap) {
-        sourceMapper.visitSource(nodeAndSmap.getSource());
+        sourceMapper.visitSource(nodeAndSmap.getSource(), nodeAndSmap.getSourcePath());
 
         MethodNode node = nodeAndSmap.getNode();
         ReifiedTypeParametersUsages reificationResult = reifiedTypeInliner.reifyInstructions(node.instructions);
@@ -269,7 +271,6 @@ public class InlineCodegen extends CallGenerator {
         adapter.accept(new InliningInstructionAdapter(codegen.v));
 
         addInlineMarker(codegen.v, false);
-        codegen.getParentCodegen().addSMAP(sourceMapper.getFileMapping());
 
         return result;
     }
@@ -350,10 +351,6 @@ public class InlineCodegen extends CallGenerator {
             return delegate.getInlineNameGenerator();
         }
 
-        @Override
-        public void addSMAP(FileMapping fm) {
-            mappings.add(fm);
-        }
     }
 
     @Override

@@ -20,13 +20,11 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import kotlin.Function0;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jet.backend.common.CodegenUtil;
 import org.jetbrains.jet.codegen.context.ClassContext;
 import org.jetbrains.jet.codegen.context.CodegenContext;
 import org.jetbrains.jet.codegen.context.FieldOwnerContext;
-import org.jetbrains.jet.codegen.inline.FileMapping;
-import org.jetbrains.jet.codegen.inline.InlineCodegenUtil;
-import org.jetbrains.jet.codegen.inline.NameGenerator;
-import org.jetbrains.jet.codegen.inline.ReifiedTypeParametersUsages;
+import org.jetbrains.jet.codegen.inline.*;
 import org.jetbrains.jet.codegen.state.GenerationState;
 import org.jetbrains.jet.lang.descriptors.*;
 import org.jetbrains.jet.lang.descriptors.annotations.Annotations;
@@ -70,6 +68,7 @@ public abstract class MemberCodegen<T extends JetElement/* TODO: & JetDeclaratio
     protected ExpressionCodegen clInit;
     private NameGenerator inlineNameGenerator;
     private final ReifiedTypeParametersUsages reifiedTypeParametersUsages = new ReifiedTypeParametersUsages();
+    private SourceMapper sourceMapper;
 
     public MemberCodegen(
             @NotNull GenerationState state,
@@ -115,6 +114,13 @@ public abstract class MemberCodegen<T extends JetElement/* TODO: & JetDeclaratio
         if (clInit != null) {
             clInit.v.visitInsn(RETURN);
             FunctionCodegen.endVisit(clInit.v, "static initializer", element);
+        }
+
+        if (sourceMapper != null) {
+            List<FileMapping> mapping = sourceMapper.getFileMapping();
+            for (FileMapping fileMapping : mapping) {
+                v.addSMAP(fileMapping);
+            }
         }
 
         v.done();
@@ -390,7 +396,13 @@ public abstract class MemberCodegen<T extends JetElement/* TODO: & JetDeclaratio
         return reifiedTypeParametersUsages;
     }
 
-    public void addSMAP(FileMapping fm) {
-        v.addSMAP(fm);
+    public SourceMapper getSourceMapper() {
+        if (sourceMapper == null) {
+            assert element != null : "Couldn't create source mapper for null element " + this;
+            Integer lineNumbers = CodegenUtil.getLineNumberForElement(element.getContainingFile(), true);
+            assert lineNumbers != null : "Couldn't extract line count in " + element.getContainingFile();
+            sourceMapper = new SourceMapper(lineNumbers);
+        }
+        return sourceMapper;
     }
 }
