@@ -70,6 +70,16 @@ import org.jetbrains.jet.plugin.stubindex.PackageIndexUtil
 import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor
 import com.intellij.psi.stubs.StubElement
 import org.jetbrains.jet.plugin.util.application.runReadAction
+import org.jetbrains.jet.lang.descriptors.FunctionDescriptor
+import org.jetbrains.jet.lang.descriptors.SimpleFunctionDescriptor
+import org.jetbrains.jet.plugin.search.usagesSearch.UsagesSearchRequest
+import com.intellij.find.findUsages.FindUsagesOptions
+import org.jetbrains.jet.plugin.findUsages.toSearchTarget
+import org.jetbrains.jet.plugin.search.usagesSearch.search
+import org.jetbrains.jet.plugin.search.usagesSearch.UsagesSearchRequestItem
+import org.jetbrains.jet.plugin.search.usagesSearch.UsagesSearchHelper
+import org.jetbrains.jet.plugin.search.usagesSearch.DefaultSearchHelper
+import org.jetbrains.jet.plugin.codeInsight.DescriptorToDeclarationUtil
 
 public class JetPositionManager(private val myDebugProcess: DebugProcess) : PositionManager {
     private val myTypeMappers = WeakHashMap<Pair<FqName, IdeaModuleInfo>, CachedValue<JetTypeMapper>>()
@@ -169,20 +179,40 @@ public class JetPositionManager(private val myDebugProcess: DebugProcess) : Posi
         if (sourcePosition.getFile() !is JetFile) {
             throw NoDataException()
         }
-        val name = classNameForPosition(sourcePosition)
+        val names = classNameForPositionAndInlinedOnes(sourcePosition)
         val result = ArrayList<ReferenceType>()
-        if (name != null) {
+        for (name in names) {
             result.addAll(myDebugProcess.getVirtualMachineProxy().classesByName(name))
         }
         return result
     }
 
+    private fun classNameForPositionAndInlinedOnes(sourcePosition: SourcePosition): List<String> {
+        val result = arrayListOf<String>()
+        val name = classNameForPosition(sourcePosition)
+        if (name != null) {
+            result.add(name)
+        }
+        val list = findInlinedCalls(sourcePosition.getElementAt())
+        result.addAll(list)
+
+        return result;
+    }
+
     private fun classNameForPosition(sourcePosition: SourcePosition): String? {
+        val psiElement = sourcePosition.getElementAt()
+        if (psiElement == null) {
+            return null
+        }
+        return classNameForPosition(psiElement)
+    }
+
+    private fun classNameForPosition(element: PsiElement): String? {
         return runReadAction {
-            val file = sourcePosition.getFile() as JetFile
+            val file = element.getContainingFile() as JetFile
             val isInLibrary = LibraryUtil.findLibraryEntry(file.getVirtualFile(), file.getProject()) != null
-            val typeMapper = if (!isInLibrary) prepareTypeMapper(file) else createTypeMapperForLibraryFile(sourcePosition.getElementAt(), file)
-            getClassNameForElement(sourcePosition.getElementAt(), typeMapper, file, isInLibrary)
+            val typeMapper = if (!isInLibrary) prepareTypeMapper(file) else createTypeMapperForLibraryFile(element, file)
+            getClassNameForElement(element, typeMapper, file, isInLibrary)
         }
     }
 
@@ -395,5 +425,37 @@ public class JetPositionManager(private val myDebugProcess: DebugProcess) : Posi
         }
 
         private fun createKeyForTypeMapper(file: JetFile) = Pair(file.getPackageFqName(), file.getModuleInfo())
+    }
+
+    private fun findInlinedCalls(element: PsiElement?): List<String> {
+        return runReadAction {
+            var result = emptyList<String>()
+            if (element != null) {
+                val psiElement = getElementToCalculateClassName(element)
+                if (psiElement is JetNamedFunction) {
+                    val typeMapper = prepareTypeMapper(psiElement.getContainingFile() as JetFile)
+                    val descriptor = typeMapper.getBindingContext().get(BindingContext.DECLARATION_TO_DESCRIPTOR, psiElement)
+                    if (descriptor is SimpleFunctionDescriptor && descriptor.getInlineStrategy().isInline()) {
+
+                        val project = myDebugProcess.getProject()
+                        val usagesSearchTarget = FindUsagesOptions(project).toSearchTarget(psiElement, true)
+
+                        result = arrayListOf<String>()
+                        val usagesSearchRequest = DefaultSearchHelper<JetNamedFunction>(true).newRequest(usagesSearchTarget)
+                        usagesSearchRequest.search().forEach {
+                            val psiElement = it.getElement()
+                            if (psiElement is JetElement) {
+                                val name = classNameForPosition(psiElement)
+                                if (name != null) {
+                                    (result as MutableList<String>).add(name)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            result
+        }
     }
 }
