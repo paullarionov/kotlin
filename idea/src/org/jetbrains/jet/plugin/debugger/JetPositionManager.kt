@@ -80,8 +80,10 @@ import org.jetbrains.jet.plugin.search.usagesSearch.UsagesSearchRequestItem
 import org.jetbrains.jet.plugin.search.usagesSearch.UsagesSearchHelper
 import org.jetbrains.jet.plugin.search.usagesSearch.DefaultSearchHelper
 import org.jetbrains.jet.plugin.codeInsight.DescriptorToDeclarationUtil
+import com.intellij.debugger.MultiRequestPositionManager
+import org.jetbrains.jet.utils.addToStdlib.singletonOrEmptyList
 
-public class JetPositionManager(private val myDebugProcess: DebugProcess) : PositionManager {
+public class JetPositionManager(private val myDebugProcess: DebugProcess) : MultiRequestPositionManager {
     private val myTypeMappers = WeakHashMap<Pair<FqName, IdeaModuleInfo>, CachedValue<JetTypeMapper>>()
 
     override fun getSourcePosition(location: Location?): SourcePosition? {
@@ -259,12 +261,23 @@ public class JetPositionManager(private val myDebugProcess: DebugProcess) : Posi
         if (classNames.isEmpty()) {
             return null
         }
-        val classPrepareRequest = myDebugProcess.getRequestsManager().createClassPrepareRequest(classPrepareRequestor, classNames.first().replace('/', '.'))
-//        classNames.subList(1, classNames.size()).forEach {
-//            classPrepareRequest.addClassFilter(it.replace('/', '.'))
-//        }
+        return myDebugProcess.getRequestsManager().createClassPrepareRequest(classPrepareRequestor, classNames.first().replace('/', '.'))
+    }
 
-        return classPrepareRequest
+    override fun createPrepareRequests(classPrepareRequestor: ClassPrepareRequestor, sourcePosition: SourcePosition): MutableList<ClassPrepareRequest> {
+        if (sourcePosition.getFile() !is JetFile) {
+            throw NoDataException()
+        }
+        val classNames = classNameForPositionAndInlinedOnes(sourcePosition)
+        if (classNames.isEmpty()) {
+            return Collections.emptyList()
+        }
+        val requests = arrayListOf<ClassPrepareRequest>()
+        for (className in classNames) {
+            requests.add(myDebugProcess.getRequestsManager().createClassPrepareRequest(classPrepareRequestor, className.replace('/', '.')))
+        }
+
+        return requests
     }
 
     TestOnly

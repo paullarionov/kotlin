@@ -73,10 +73,10 @@ public abstract class AbstractJetInspectionTest: LightCodeInsightFixtureTestCase
                 val scope = AnalysisScope(getProject(), psiFiles.map { it.getVirtualFile()!! })
                 scope.invalidate()
 
-                val inspectionManager = (InspectionManager.getInstance(getProject()) as InspectionManagerEx)
+                val inspectionManager: InspectionManagerEx = (InspectionManager.getInstance(getProject()) as InspectionManagerEx)
                 val globalContext = CodeInsightTestFixtureImpl.createGlobalContextForTool(scope, getProject(), inspectionManager, toolWrapper)
 
-                InspectionTestUtil.runTool(toolWrapper, scope, globalContext, inspectionManager)
+                InspectionTestUtil.runTool(toolWrapper, scope, globalContext)
                 InspectionTestUtil.compareToolResults(globalContext, toolWrapper, false, inspectionsTestDir.getPath())
             }
             finally {
