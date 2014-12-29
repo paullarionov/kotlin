@@ -49,9 +49,11 @@ import org.jetbrains.jet.cli.jvm.compiler.EnvironmentConfigFiles;
 import org.jetbrains.jet.cli.jvm.compiler.JetCoreEnvironment;
 import org.jetbrains.jet.config.CompilerConfiguration;
 import org.jetbrains.jet.config.Services;
+import org.jetbrains.jet.lang.descriptors.ModuleDescriptor;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.resolve.diagnostics.Diagnostics;
 import org.jetbrains.jet.utils.PathUtil;
+import org.jetbrains.jet.utils.serializer.Serializer;
 import org.jetbrains.k2js.analyze.TopDownAnalyzerFacadeForJS;
 import org.jetbrains.k2js.config.*;
 import org.jetbrains.k2js.facade.MainCallParameters;
@@ -123,7 +125,8 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
             return COMPILATION_ERROR;
         }
 
-        if (analyzeAndReportErrors(messageCollector, sourcesFiles, config)) {
+        AnalyzerWithCompilerReport analyzerWithCompilerReport = analyzeAndReportErrors(messageCollector, sourcesFiles, config);
+        if (analyzerWithCompilerReport.hasErrors()) {
             return COMPILATION_ERROR;
         }
 
@@ -179,6 +182,15 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
         }
         OutputUtilsPackage.writeAll(outputFiles, outputDir, messageCollector);
 
+        if (arguments.metaInfo != null) {
+            AnalysisResult analysisResult = analyzerWithCompilerReport.getAnalysisResult();
+            assert analysisResult != null : "analysisResult should not be null";
+            File metaFile = new File(arguments.metaInfo);
+            ModuleDescriptor moduleDescriptor = analysisResult.getModuleDescriptor();
+            Serializer serializer = new Serializer();
+            serializer.serialize(moduleDescriptor, sourcesFiles, metaFile);
+        }
+
         return OK;
     }
 
@@ -198,7 +210,7 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
                                 CompilerMessageLocation.NO_LOCATION);
     }
 
-    private static boolean analyzeAndReportErrors(@NotNull MessageCollector messageCollector,
+    private static AnalyzerWithCompilerReport analyzeAndReportErrors(@NotNull MessageCollector messageCollector,
             @NotNull final List<JetFile> sources, @NotNull final Config config) {
         AnalyzerWithCompilerReport analyzerWithCompilerReport = new AnalyzerWithCompilerReport(messageCollector);
         analyzerWithCompilerReport.analyzeAndReport(sources, new Function0<AnalysisResult>() {
@@ -207,7 +219,7 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
                 return TopDownAnalyzerFacadeForJS.analyzeFiles(sources, Predicates.<PsiFile>alwaysTrue(), config);
             }
         });
-        return analyzerWithCompilerReport.hasErrors();
+        return analyzerWithCompilerReport;
     }
 
     @NotNull
