@@ -37,6 +37,10 @@ import org.jetbrains.jet.analyzer.ModuleContent
 import org.jetbrains.jet.lang.resolve.kotlin.DeserializedResolverUtils
 import org.jetbrains.jet.lang.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.jet.lang.psi.JetFile
+import kotlin.platform.platformStatic
+import org.json.JSONObject
+import com.intellij.openapi.util.io.FileUtil
+import javax.xml.bind.DatatypeConverter.printBase64Binary
 
 private object BuiltInsSerializerExtension : SerializerExtension() {
     override fun serializeClass(descriptor: ClassDescriptor, proto: ProtoBuf.Class.Builder, stringTable: StringTable) {
@@ -84,13 +88,15 @@ public class Serializer() {
     private var totalSize = 0
     private var totalFiles = 0
 
-    public fun serialize(moduleDescriptor: ModuleDescriptor, files: List<JetFile>, destDir: File) {
+    public fun serialize(moduleDescriptor: ModuleDescriptor, files: List<JetFile>, meta: File) {
+        val jsonObject: JSONObject = JSONObject()
         files.map { it.getPackageFqName() }.toSet().forEach {
-            fqName -> serializePackage(moduleDescriptor, fqName, destDir)
+            fqName -> serializePackage(moduleDescriptor, fqName, jsonObject)
         }
+        FileUtil.writeToFile(meta, jsonObject.toString())
     }
 
-    fun serializePackage(module: ModuleDescriptor, fqName: FqName, destDir: File) {
+    fun serializePackage(module: ModuleDescriptor, fqName: FqName, jsonObject: JSONObject) {
         val packageView = module.getPackage(fqName) ?: error("No package resolved in $module")
 
         // TODO: perform some kind of validation? At the moment not possible because DescriptorValidator is in compiler-tests
@@ -104,7 +110,7 @@ public class Serializer() {
             override fun writeClass(classDescriptor: ClassDescriptor, classProto: ProtoBuf.Class) {
                 val stream = ByteArrayOutputStream()
                 classProto.writeTo(stream)
-                write(destDir, getFileName(classDescriptor), stream)
+                write(jsonObject, getFileName(classDescriptor), stream)
             }
         })
 
@@ -112,19 +118,17 @@ public class Serializer() {
         val fragments = module.getPackageFragmentProvider().getPackageFragments(fqName)
         val packageProto = serializer.packageProto(fragments).build() ?: error("Package fragments not serialized: $fragments")
         packageProto.writeTo(packageStream)
-        write(destDir, BuiltInsSerializationUtil.getPackageFilePath(fqName), packageStream)
+        write(jsonObject, BuiltInsSerializationUtil.getPackageFilePath(fqName), packageStream)
 
         val nameStream = ByteArrayOutputStream()
         NameSerializationUtil.serializeStringTable(nameStream, serializer.getStringTable())
-        write(destDir, BuiltInsSerializationUtil.getStringTableFilePath(fqName), nameStream)
+        write(jsonObject, BuiltInsSerializationUtil.getStringTableFilePath(fqName), nameStream)
     }
 
-    fun write(destDir: File, fileName: String, stream: ByteArrayOutputStream) {
+    fun write(jsonObject: JSONObject, fileName: String, stream: ByteArrayOutputStream) {
         totalSize += stream.size()
         totalFiles++
-        val file = File(destDir, fileName)
-        file.getParentFile()?.mkdirs()
-        file.writeBytes(stream.toByteArray())
+        jsonObject.put(fileName, printBase64Binary(stream.toByteArray()))
     }
 
     fun getFileName(classDescriptor: ClassDescriptor): String {
