@@ -130,6 +130,9 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
             return COMPILATION_ERROR;
         }
 
+        AnalysisResult analysisResult = analyzerWithCompilerReport.getAnalysisResult();
+        assert analysisResult != null : "analysisResult should not be null";
+
         File outputPrefixFile = null;
         if (arguments.outputPrefix != null) {
             outputPrefixFile = new File(arguments.outputPrefix);
@@ -158,7 +161,7 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
         try {
             //noinspection unchecked
             status = translateWithMainCallParameters(mainCallParameters, sourcesFiles, outputFile, outputPrefixFile, outputPostfixFile,
-                                                    config, Consumer.EMPTY_CONSUMER);
+                                                    config, analysisResult, Consumer.EMPTY_CONSUMER);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -183,8 +186,6 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
         OutputUtilsPackage.writeAll(outputFiles, outputDir, messageCollector);
 
         if (arguments.metaInfo != null) {
-            AnalysisResult analysisResult = analyzerWithCompilerReport.getAnalysisResult();
-            assert analysisResult != null : "analysisResult should not be null";
             File metaFile = new File(arguments.metaInfo);
             ModuleDescriptor moduleDescriptor = analysisResult.getModuleDescriptor();
             Serializer serializer = new Serializer();
