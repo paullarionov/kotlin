@@ -24,7 +24,6 @@ import org.jetbrains.jet.lang.resolve.BindingContext;
 import org.jetbrains.jet.lang.resolve.DescriptorResolver;
 import org.jetbrains.jet.lang.resolve.lazy.ForceResolveUtil;
 import org.jetbrains.jet.lang.resolve.lazy.LazyEntity;
-import org.jetbrains.jet.lang.resolve.lazy.ResolveSession;
 import org.jetbrains.jet.lang.types.JetType;
 import org.jetbrains.jet.lexer.JetTokens;
 
@@ -33,12 +32,12 @@ import java.util.Set;
 import static org.jetbrains.jet.lang.resolve.source.SourcePackage.toSourceElement;
 
 public class LazyTypeParameterDescriptor extends AbstractLazyTypeParameterDescriptor implements LazyEntity {
-    private final ResolveSession resolveSession;
+    private final LazyClassContext resolveSession;
 
     private final JetTypeParameter jetTypeParameter;
 
     public LazyTypeParameterDescriptor(
-            @NotNull ResolveSession resolveSession,
+            @NotNull LazyClassContext resolveSession,
             @NotNull LazyClassDescriptor containingDeclaration,
             @NotNull JetTypeParameter jetTypeParameter,
             int index) {

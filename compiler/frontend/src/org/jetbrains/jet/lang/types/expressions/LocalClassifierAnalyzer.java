@@ -17,21 +17,20 @@
 package org.jetbrains.jet.lang.types.expressions;
 
 import com.google.common.base.Predicates;
-import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jet.context.GlobalContext;
-import org.jetbrains.jet.di.InjectorForTopDownAnalyzerBasic;
+import org.jetbrains.jet.di.InjectorForLazyTopDownAnalyzerBasic;
 import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor;
-import org.jetbrains.jet.lang.descriptors.PropertyDescriptor;
-import org.jetbrains.jet.lang.descriptors.SimpleFunctionDescriptor;
-import org.jetbrains.jet.lang.descriptors.impl.MutableClassDescriptor;
-import org.jetbrains.jet.lang.descriptors.impl.PackageLikeBuilder;
+import org.jetbrains.jet.lang.descriptors.impl.ModuleDescriptorImpl;
 import org.jetbrains.jet.lang.psi.JetClassOrObject;
-import org.jetbrains.jet.lang.resolve.AdditionalCheckerProvider;
-import org.jetbrains.jet.lang.resolve.DescriptorUtils;
-import org.jetbrains.jet.lang.resolve.TopDownAnalysisContext;
-import org.jetbrains.jet.lang.resolve.TopDownAnalysisParameters;
+import org.jetbrains.jet.lang.resolve.*;
+import org.jetbrains.jet.lang.resolve.lazy.data.JetClassLikeInfo;
+import org.jetbrains.jet.lang.resolve.lazy.declarations.ClassMemberDeclarationProvider;
+import org.jetbrains.jet.lang.resolve.lazy.declarations.DeclarationProviderFactory;
+import org.jetbrains.jet.lang.resolve.lazy.declarations.PackageMemberDeclarationProvider;
+import org.jetbrains.jet.lang.resolve.lazy.declarations.PsiBasedClassMemberDeclarationProvider;
+import org.jetbrains.jet.lang.resolve.name.FqName;
 import org.jetbrains.jet.lang.resolve.scopes.WritableScope;
 import org.jetbrains.jet.lang.types.DynamicTypesSettings;
 
@@ -39,7 +38,7 @@ import java.util.Collections;
 
 /* package */ class LocalClassifierAnalyzer {
     public static void processClassOrObject(
-            @NotNull GlobalContext globalContext,
+            @NotNull final GlobalContext globalContext,
             @Nullable final WritableScope scope,
             @NotNull ExpressionTypingContext context,
             @NotNull final DeclarationDescriptor containingDeclaration,
@@ -54,52 +53,69 @@ import java.util.Collections;
                         Predicates.equalTo(object.getContainingFile())
                 );
 
-        InjectorForTopDownAnalyzerBasic injector = new InjectorForTopDownAnalyzerBasic(
-                object.getProject(),
-                topDownAnalysisParameters,
-                context.trace,
-                DescriptorUtils.getContainingModule(containingDeclaration),
-                additionalCheckerProvider,
-                dynamicTypesSettings
-        );
-
         TopDownAnalysisContext c = new TopDownAnalysisContext(topDownAnalysisParameters);
         c.setOuterDataFlowInfo(context.dataFlowInfo);
 
-        injector.getTopDownAnalyzer().doProcess(
-               c,
-               context.scope,
-               new PackageLikeBuilder() {
+        LazyTopDownAnalyzer lazyTopDownAnalyzer = new InjectorForLazyTopDownAnalyzerBasic(
+                object.getProject(),
+                globalContext,
+                context.trace,
+                (ModuleDescriptorImpl) DescriptorUtils.getContainingModule(containingDeclaration),
+                new DeclarationProviderFactory() {
+                    @NotNull
+                    @Override
+                    public ClassMemberDeclarationProvider getClassMemberDeclarationProvider(@NotNull JetClassLikeInfo classLikeInfo) {
+                        return new PsiBasedClassMemberDeclarationProvider(globalContext.getStorageManager(), classLikeInfo);
+                    }
 
-                   @NotNull
-                   @Override
-                   public DeclarationDescriptor getOwnerForChildren() {
-                       return containingDeclaration;
-                   }
+                    @Nullable
+                    @Override
+                    public PackageMemberDeclarationProvider getPackageMemberDeclarationProvider(@NotNull FqName packageFqName) {
+                        return null;
+                    }
+                }
+        ).getLazyTopDownAnalyzer();
 
-                   @Override
-                   public void addClassifierDescriptor(@NotNull MutableClassDescriptor classDescriptor) {
-                       if (scope != null) {
-                           scope.addClassifierDescriptor(classDescriptor);
-                       }
-                   }
 
-                   @Override
-                   public void addFunctionDescriptor(@NotNull SimpleFunctionDescriptor functionDescriptor) {
-                       throw new UnsupportedOperationException();
-                   }
-
-                   @Override
-                   public void addPropertyDescriptor(@NotNull PropertyDescriptor propertyDescriptor) {
-
-                   }
-
-                   @Override
-                   public ClassObjectStatus setClassObjectDescriptor(@NotNull MutableClassDescriptor classObjectDescriptor) {
-                       return null;
-                   }
-               },
-               Collections.<PsiElement>singletonList(object)
+        lazyTopDownAnalyzer.analyzeDeclarations(
+                topDownAnalysisParameters,
+                Collections.singletonList(object)
         );
+
+        //injector.getTopDownAnalyzer().doProcess(
+        //       c,
+        //       context.scope,
+        //       new PackageLikeBuilder() {
+        //
+        //           @NotNull
+        //           @Override
+        //           public DeclarationDescriptor getOwnerForChildren() {
+        //               return containingDeclaration;
+        //           }
+        //
+        //           @Override
+        //           public void addClassifierDescriptor(@NotNull MutableClassDescriptor classDescriptor) {
+        //               if (scope != null) {
+        //                   scope.addClassifierDescriptor(classDescriptor);
+        //               }
+        //           }
+        //
+        //           @Override
+        //           public void addFunctionDescriptor(@NotNull SimpleFunctionDescriptor functionDescriptor) {
+        //               throw new UnsupportedOperationException();
+        //           }
+        //
+        //           @Override
+        //           public void addPropertyDescriptor(@NotNull PropertyDescriptor propertyDescriptor) {
+        //
+        //           }
+        //
+        //           @Override
+        //           public ClassObjectStatus setClassObjectDescriptor(@NotNull MutableClassDescriptor classObjectDescriptor) {
+        //               return null;
+        //           }
+        //       },
+        //       Collections.<PsiElement>singletonList(object)
+        //);
     }
 }

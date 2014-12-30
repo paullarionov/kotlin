@@ -19,7 +19,6 @@ package org.jetbrains.jet.lang.resolve.lazy.descriptors;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import com.intellij.psi.PsiElement;
 import kotlin.Function0;
 import kotlin.Function1;
 import kotlin.KotlinPackage;
@@ -38,8 +37,6 @@ import org.jetbrains.jet.lang.resolve.ModifiersChecker;
 import org.jetbrains.jet.lang.resolve.TypeHierarchyResolver;
 import org.jetbrains.jet.lang.resolve.lazy.ForceResolveUtil;
 import org.jetbrains.jet.lang.resolve.lazy.LazyEntity;
-import org.jetbrains.jet.lang.resolve.lazy.ResolveSession;
-import org.jetbrains.jet.lang.resolve.lazy.ScopeProvider;
 import org.jetbrains.jet.lang.resolve.lazy.data.JetClassInfoUtil;
 import org.jetbrains.jet.lang.resolve.lazy.data.JetClassLikeInfo;
 import org.jetbrains.jet.lang.resolve.lazy.data.SyntheticClassObjectInfo;
@@ -73,7 +70,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
             return TypeUtils.getClassDescriptor(type) != null;
         }
     };
-    private final ResolveSession resolveSession;
+    private final LazyClassContext resolveSession;
 
     private final JetClassLikeInfo originalClassInfo;
     private final ClassMemberDeclarationProvider declarationProvider;
@@ -99,7 +96,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
     private final NullableLazyValue<Void> forceResolveAllContents;
 
     public LazyClassDescriptor(
-            @NotNull final ResolveSession resolveSession,
+            @NotNull LazyClassContext resolveSession,
             @NotNull DeclarationDescriptor containingDeclaration,
             @NotNull Name name,
             @NotNull JetClassLikeInfo classLikeInfo
@@ -149,8 +146,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
                         @NotNull
                         @Override
                         public JetScope getScope() {
-                            JetClassLikeInfo ownerInfo = declarationProvider.getOwnerInfo();
-                            return resolveSession.getScopeProvider().getResolutionScopeForDeclaration(ownerInfo.getScopeAnchor());
+                            return getOuterScope();
                         }
                     },
                     modifierList.getAnnotationEntries()
@@ -224,7 +220,7 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
     // NOTE: Called from constructor!
     @NotNull
     protected LazyClassMemberScope createMemberScope(
-            @NotNull ResolveSession resolveSession,
+            @NotNull LazyClassContext resolveSession,
             @NotNull ClassMemberDeclarationProvider declarationProvider
     ) {
         return new LazyClassMemberScope(resolveSession, declarationProvider, this, resolveSession.getTrace());
@@ -250,11 +246,12 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
         }
         scope.changeLockLevel(WritableScope.LockLevel.READING);
 
-        PsiElement scopeAnchor = declarationProvider.getOwnerInfo().getScopeAnchor();
+        return new ChainedScope(this, "ScopeForClassHeaderResolution: " + getName(), scope, getOuterScope());
+    }
 
-        return new ChainedScope(this, "ScopeForClassHeaderResolution: " + getName(),
-                scope,
-                getScopeProvider().getResolutionScopeForDeclaration(scopeAnchor));
+    @NotNull
+    protected JetScope getOuterScope() {
+        return resolveSession.getOuterScope();//.getResolutionScopeForDeclaration(declarationProvider.getOwnerInfo().getScopeAnchor());
     }
 
     @Override
@@ -694,10 +691,5 @@ public class LazyClassDescriptor extends ClassDescriptorBase implements ClassDes
             ForceResolveUtil.forceResolveAllContents(getSupertypes());
             ForceResolveUtil.forceResolveAllContents(getParameters());
         }
-    }
-
-    @NotNull
-    private ScopeProvider getScopeProvider() {
-        return resolveSession.getScopeProvider();
     }
 }

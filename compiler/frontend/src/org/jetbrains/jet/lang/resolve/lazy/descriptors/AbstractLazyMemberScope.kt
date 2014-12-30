@@ -37,12 +37,12 @@ import org.jetbrains.jet.utils.toReadOnlyList
 import org.jetbrains.jet.lang.resolve.scopes.DescriptorKindFilter
 
 public abstract class AbstractLazyMemberScope<D : DeclarationDescriptor, DP : DeclarationProvider> protected(
-        protected val resolveSession: ResolveSession,
+        protected val resolveSession: LazyClassContext,
         protected val declarationProvider: DP,
         protected val thisDescriptor: D,
         protected val trace: BindingTrace) : JetScope {
 
-    protected val storageManager: StorageManager = resolveSession.getStorageManager()
+    protected val storageManager: StorageManager = resolveSession.storageManager
     private val classDescriptors: MemoizedFunctionToNotNull<Name, List<ClassDescriptor>> = storageManager.createMemoizedFunction { resolveClassDescriptor(it) }
     private val functionDescriptors: MemoizedFunctionToNotNull<Name, Collection<FunctionDescriptor>> = storageManager.createMemoizedFunction { doGetFunctions(it) }
     private val propertyDescriptors: MemoizedFunctionToNotNull<Name, Collection<VariableDescriptor>> = storageManager.createMemoizedFunction { doGetProperties(it) }
@@ -69,7 +69,7 @@ public abstract class AbstractLazyMemberScope<D : DeclarationDescriptor, DP : De
         val declarations = declarationProvider.getFunctionDeclarations(name)
         for (functionDeclaration in declarations) {
             val resolutionScope = getScopeForMemberDeclarationResolution(functionDeclaration)
-            result.add(resolveSession.getDescriptorResolver().resolveFunctionDescriptorWithAnnotationArguments(
+            result.add(resolveSession.descriptorResolver.resolveFunctionDescriptorWithAnnotationArguments(
                     thisDescriptor,
                     resolutionScope,
                     functionDeclaration,
@@ -96,7 +96,7 @@ public abstract class AbstractLazyMemberScope<D : DeclarationDescriptor, DP : De
         val declarations = declarationProvider.getPropertyDeclarations(name)
         for (propertyDeclaration in declarations) {
             val resolutionScope = getScopeForMemberDeclarationResolution(propertyDeclaration)
-            val propertyDescriptor = resolveSession.getDescriptorResolver().resolvePropertyDescriptor(
+            val propertyDescriptor = resolveSession.descriptorResolver.resolvePropertyDescriptor(
                     thisDescriptor,
                     resolutionScope,
                     propertyDeclaration,

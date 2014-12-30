@@ -21,6 +21,7 @@ import org.jetbrains.jet.context.GlobalContext;
 import org.jetbrains.jet.lang.PlatformToKotlinClassMap;
 import org.jetbrains.jet.lang.reflect.ReflectionTypes;
 import org.jetbrains.jet.lang.resolve.AdditionalCheckerProvider;
+import org.jetbrains.jet.lang.resolve.LazyTopDownAnalyzer;
 import org.jetbrains.jet.lang.resolve.calls.CallResolver;
 import org.jetbrains.jet.lang.types.DynamicTypesSettings;
 import org.jetbrains.jet.lang.types.lang.KotlinBuiltIns;
@@ -39,6 +40,7 @@ public class ExpressionTypingComponents {
     /*package*/ AdditionalCheckerProvider additionalCheckerProvider;
     /*package*/ DynamicTypesSettings dynamicTypesSettings;
     /*package*/ KotlinBuiltIns builtIns;
+    /*package*/ LazyTopDownAnalyzer lazyTopDownAnalyzer;
 
     @Inject
     public void setGlobalContext(@NotNull GlobalContext globalContext) {
@@ -93,6 +95,11 @@ public class ExpressionTypingComponents {
     @Inject
     public void setBuiltIns(@NotNull KotlinBuiltIns builtIns) {
         this.builtIns = builtIns;
+    }
+
+    @Inject
+    public void setLazyTopDownAnalyzer(@NotNull LazyTopDownAnalyzer lazyTopDownAnalyzer) {
+        this.lazyTopDownAnalyzer = lazyTopDownAnalyzer;
     }
 
     @NotNull

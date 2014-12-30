@@ -28,13 +28,13 @@ import org.jetbrains.jet.utils.toReadOnlyList
 
 // SCRIPT: Members of a script class
 public class LazyScriptClassMemberScope protected(
-        resolveSession: ResolveSession,
+        resolveSession: LazyClassContext,
         declarationProvider: ClassMemberDeclarationProvider,
         thisClass: LazyClassDescriptor,
         trace: BindingTrace)
 : LazyClassMemberScope(resolveSession, declarationProvider, thisClass, trace) {
 
-    private val scriptResultProperty: NotNullLazyValue<PropertyDescriptor> = resolveSession.getStorageManager().createLazyValue {
+    private val scriptResultProperty: NotNullLazyValue<PropertyDescriptor> = resolveSession.storageManager.createLazyValue {
         val scriptInfo = declarationProvider.getOwnerInfo() as JetScriptInfo
         ScriptDescriptorImpl.createScriptResultProperty(resolveSession.getScriptDescriptor(scriptInfo.script))
     }

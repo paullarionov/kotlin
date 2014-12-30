@@ -48,7 +48,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ResolveSession implements KotlinCodeAnalyzer {
+public class ResolveSession implements KotlinCodeAnalyzer, LazyClassContext {
     private final LazyResolveStorageManager storageManager;
     private final ExceptionTracker exceptionTracker;
 
@@ -526,5 +526,11 @@ public class ResolveSession implements KotlinCodeAnalyzer {
     @NotNull
     public QualifiedExpressionResolver getQualifiedExpressionResolver() {
         return qualifiedExpressionResolver;
+    }
+
+    @NotNull
+    @Override
+    public JetScope getOuterScope() {
+        throw new UnsupportedOperationException(); // TODO
     }
 }

@@ -21,14 +21,13 @@ import org.jetbrains.jet.lang.descriptors.DeclarationDescriptor;
 import org.jetbrains.jet.lang.descriptors.Visibilities;
 import org.jetbrains.jet.lang.descriptors.Visibility;
 import org.jetbrains.jet.lang.resolve.TemporaryBindingTrace;
-import org.jetbrains.jet.lang.resolve.lazy.ResolveSession;
 import org.jetbrains.jet.lang.resolve.lazy.data.JetScriptInfo;
 import org.jetbrains.jet.lang.resolve.lazy.declarations.ClassMemberDeclarationProvider;
 import org.jetbrains.jet.lang.resolve.name.Name;
 
 public class LazyScriptClassDescriptor extends LazyClassDescriptor {
     public LazyScriptClassDescriptor(
-            @NotNull ResolveSession resolveSession,
+            @NotNull LazyClassContext resolveSession,
             @NotNull DeclarationDescriptor containingDeclaration,
             @NotNull Name name,
             @NotNull JetScriptInfo scriptInfo
@@ -39,7 +38,7 @@ public class LazyScriptClassDescriptor extends LazyClassDescriptor {
     @NotNull
     @Override
     protected LazyScriptClassMemberScope createMemberScope(
-            @NotNull ResolveSession resolveSession, @NotNull ClassMemberDeclarationProvider declarationProvider
+            @NotNull LazyClassContext resolveSession, @NotNull ClassMemberDeclarationProvider declarationProvider
     ) {
         return new LazyScriptClassMemberScope(
                 resolveSession,
