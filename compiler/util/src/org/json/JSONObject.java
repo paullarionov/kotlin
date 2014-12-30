@@ -90,7 +90,6 @@ import java.util.Set;
  * or <code>null</code>.</li>
  * </ul>
  *
- * @author JSON.org
  * @version 2014-05-03
  */
 public class JSONObject {
@@ -712,7 +711,7 @@ public class JSONObject {
      *         is the JSONObject.NULL object.
      */
     public boolean isNull(String key) {
-        return JSONObject.NULL.equals(this.opt(key));
+        return NULL.equals(this.opt(key));
     }
 
     /**
@@ -1344,7 +1343,7 @@ public class JSONObject {
             return Boolean.FALSE;
         }
         if (string.equalsIgnoreCase("null")) {
-            return JSONObject.NULL;
+            return NULL;
         }
 
         /*
@@ -1638,7 +1637,7 @@ public class JSONObject {
             throws JSONException {
         try {
             boolean commanate = false;
-            final int length = this.length();
+            int length = this.length();
             Iterator<String> keys = this.keys();
             writer.write('{');
 
@@ -1651,7 +1650,7 @@ public class JSONObject {
                 }
                 writeValue(writer, this.map.get(key), indentFactor, indent);
             } else if (length != 0) {
-                final int newindent = indent + indentFactor;
+                int newindent = indent + indentFactor;
                 while (keys.hasNext()) {
                     Object key = keys.next();
                     if (commanate) {

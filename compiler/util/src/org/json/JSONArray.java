@@ -74,7 +74,6 @@ import java.util.Map;
  * <code>null</code>.</li>
  * </ul>
  *
- * @author JSON.org
  * @version 2014-05-03
  */
 public class JSONArray {
@@ -949,7 +948,7 @@ public class JSONArray {
                 JSONObject.writeValue(writer, this.myArrayList.get(0),
                         indentFactor, indent);
             } else if (length != 0) {
-                final int newindent = indent + indentFactor;
+                int newindent = indent + indentFactor;
 
                 for (int i = 0; i < length; i += 1) {
                     if (commanate) {
