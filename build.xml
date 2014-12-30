@@ -15,12 +15,10 @@
     <property name="bootstrap.runtime" value="${bootstrap.compiler.home}/lib/kotlin-runtime.jar"/>
     <property name="bootstrap.runtime.minimal" value="${bootstrap.compiler.home}/lib/kotlin-runtime-minimal.jar"/>
 
-    <property name="output.relative" value="dist"/>
-    <property name="output" value="${basedir}/${output.relative}"/>
+    <property name="output" value="${basedir}/dist"/>
     <property name="kotlin-home" value="${output}/kotlinc"/>
     <property name="build.number" value="snapshot"/>
     <property name="bootstrap.build.no.tests" value="false"/>
-    <property name="output.name" value="kotlin-compiler-${build.number}"/>
     <property name="idea.sdk" value="${basedir}/ideaSDK"/>
 
     <property name="java.target" value="1.6"/>
@@ -739,7 +737,7 @@
                 <include name="libraries/stdlib/src"/>
             </src>
             <class-path>
-                <pathelement path="${output.relative}/classes/builtins"/>
+                <pathelement path="${output}/classes/builtins"/>
             </class-path>
         </new-kotlinc>
     </target>
@@ -755,10 +753,10 @@
                 <include name="core/util.runtime/src"/>
             </src>
             <class-path>
-                <pathelement path="${output.relative}/classes/builtins"/>
-                <pathelement path="${output.relative}/classes/stdlib"/>
-                <pathelement path="ideaSDK/lib/protobuf-2.5.0.jar"/>
-                <pathelement path="lib/javax.inject.jar"/>
+                <pathelement path="${output}/classes/builtins"/>
+                <pathelement path="${output}/classes/stdlib"/>
+                <pathelement path="${idea.sdk}/lib/protobuf-2.5.0.jar"/>
+                <pathelement path="${basedir}/lib/javax.inject.jar"/>
             </class-path>
         </new-kotlinc>
     </target>
@@ -769,10 +767,10 @@
                 <include name="core/reflection.jvm/src"/>
             </src>
             <class-path>
-                <pathelement path="${output.relative}/classes/builtins"/>
-                <pathelement path="${output.relative}/classes/stdlib"/>
-                <pathelement path="${output.relative}/classes/core"/>
-                <pathelement path="ideaSDK/lib/protobuf-2.5.0.jar"/>
+                <pathelement path="${output}/classes/builtins"/>
+                <pathelement path="${output}/classes/stdlib"/>
+                <pathelement path="${output}/classes/core"/>
+                <pathelement path="${idea.sdk}/lib/protobuf-2.5.0.jar"/>
             </class-path>
         </new-kotlinc>
     </target>
@@ -783,7 +781,7 @@
                 <include name="core/reflection.stub.jvm/src"/>
             </src>
             <class-path>
-                <pathelement path="${output.relative}/classes/builtins"/>
+                <pathelement path="${output}/classes/builtins"/>
             </class-path>
         </new-kotlinc>
     </target>
@@ -820,7 +818,7 @@
                          implementation-title="${manifest.impl.title.kotlin.jvm.runtime}">
             <additional-classes>
                 <fileset dir="${output}/classes/core"/>
-                <zipfileset src="ideaSDK/lib/protobuf-2.5.0.jar"/>
+                <zipfileset src="${idea.sdk}/lib/protobuf-2.5.0.jar"/>
                 <zipfileset dir="${output}/builtins"/>
             </additional-classes>
         </do-pack-runtime>
@@ -894,7 +892,7 @@
             description="Builds compiler jar from project out dir"/>
 
     <target name="zip-compiler">
-        <zip destfile="${output}/${output.name}.zip">
+        <zip destfile="${output}/kotlin-compiler-${build.number}.zip">
             <zipfileset prefix="kotlinc" dir="${kotlin-home}" excludes="bin/*"/>
             <zipfileset prefix="kotlinc/bin" dir="${kotlin-home}/bin" includes="*.bat" filemode="644"/>
             <zipfileset prefix="kotlinc/bin" dir="${kotlin-home}/bin" excludes="*.bat" filemode="755"/>
