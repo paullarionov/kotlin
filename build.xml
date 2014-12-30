@@ -20,6 +20,8 @@
     <property name="build.number" value="snapshot"/>
     <property name="bootstrap.build.no.tests" value="false"/>
     <property name="idea.sdk" value="${basedir}/ideaSDK"/>
+    <property name="protobuf.jar" value="${idea.sdk}/lib/protobuf-2.5.0.jar"/>
+    <property name="javax.inject.jar" value="${basedir}/lib/javax.inject.jar"/>
 
     <property name="java.target" value="1.6"/>
 
@@ -55,7 +57,7 @@
     <path id="classpath">
         <file file="${bootstrap.runtime}"/>
         <fileset dir="${idea.sdk}" includes="core/*.jar"/>
-        <fileset dir="${idea.sdk}" includes="lib/protobuf-2.5.0.jar"/>
+        <pathelement location="${protobuf.jar}"/>
 
         <fileset dir="${basedir}/lib" includes="**/*.jar"/>
         <fileset dir="${dependencies.dir}" includes="jline.jar"/>
@@ -424,12 +426,12 @@
 
                 <zipgroupfileset dir="${basedir}/lib" includes="*.jar"/>
                 <zipgroupfileset dir="${basedir}/ideaSDK/core" includes="*.jar" excludes="util.jar"/>
-                <zipgroupfileset dir="${basedir}/ideaSDK/lib" includes="jna-utils.jar"/>
-                <zipgroupfileset dir="${basedir}/ideaSDK/lib" includes="oromatcher.jar"/>
-                <zipgroupfileset dir="${basedir}/ideaSDK/lib" includes="protobuf-2.5.0.jar"/>
-                <zipgroupfileset dir="${basedir}/ideaSDK/jps" includes="jps-model.jar"/>
-                <zipgroupfileset dir="${dependencies.dir}" includes="jline.jar"/>
-                <zipgroupfileset dir="${dependencies.dir}" includes="cli-parser-1.1.1.jar"/>
+                <zipfileset src="${idea.sdk}/lib/jna-utils.jar"/>
+                <zipfileset src="${idea.sdk}/lib/oromatcher.jar"/>
+                <zipfileset src="${idea.sdk}/jps/jps-model.jar"/>
+                <zipfileset src="${dependencies.dir}/jline.jar"/>
+                <zipfileset src="${dependencies.dir}/cli-parser-1.1.1.jar"/>
+                <zipfileset src="${protobuf.jar}"/>
 
                 <manifest>
                     <attribute name="Built-By" value="${manifest.impl.vendor}"/>
@@ -755,8 +757,8 @@
             <class-path>
                 <pathelement path="${output}/classes/builtins"/>
                 <pathelement path="${output}/classes/stdlib"/>
-                <pathelement path="${idea.sdk}/lib/protobuf-2.5.0.jar"/>
-                <pathelement path="${basedir}/lib/javax.inject.jar"/>
+                <pathelement path="${protobuf.jar}"/>
+                <pathelement path="${javax.inject.jar}"/>
             </class-path>
         </new-kotlinc>
     </target>
@@ -770,7 +772,7 @@
                 <pathelement path="${output}/classes/builtins"/>
                 <pathelement path="${output}/classes/stdlib"/>
                 <pathelement path="${output}/classes/core"/>
-                <pathelement path="${idea.sdk}/lib/protobuf-2.5.0.jar"/>
+                <pathelement path="${protobuf.jar}"/>
             </class-path>
         </new-kotlinc>
     </target>
@@ -818,8 +820,8 @@
                          implementation-title="${manifest.impl.title.kotlin.jvm.runtime}">
             <additional-classes>
                 <fileset dir="${output}/classes/core"/>
-                <zipfileset src="${idea.sdk}/lib/protobuf-2.5.0.jar"/>
                 <zipfileset dir="${output}/builtins"/>
+                <zipfileset src="${protobuf.jar}"/>
             </additional-classes>
         </do-pack-runtime>
 
