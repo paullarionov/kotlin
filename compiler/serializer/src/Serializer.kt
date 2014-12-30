@@ -88,12 +88,10 @@ public class Serializer() {
     private var totalSize = 0
     private var totalFiles = 0
 
-    public fun serialize(moduleDescriptor: ModuleDescriptor, files: List<JetFile>, meta: File) {
-        val jsonObject: JSONObject = JSONObject()
+    public fun serialize(moduleDescriptor: ModuleDescriptor, files: List<JetFile>, jsonObject: JSONObject) {
         files.map { it.getPackageFqName() }.toSet().forEach {
             fqName -> serializePackage(moduleDescriptor, fqName, jsonObject)
         }
-        FileUtil.writeToFile(meta, jsonObject.toString())
     }
 
     fun serializePackage(module: ModuleDescriptor, fqName: FqName, jsonObject: JSONObject) {

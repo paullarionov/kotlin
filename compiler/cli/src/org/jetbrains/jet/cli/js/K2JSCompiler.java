@@ -52,12 +52,14 @@ import org.jetbrains.jet.config.Services;
 import org.jetbrains.jet.lang.descriptors.ModuleDescriptor;
 import org.jetbrains.jet.lang.psi.JetFile;
 import org.jetbrains.jet.lang.resolve.diagnostics.Diagnostics;
+import org.jetbrains.jet.utils.LibraryUtils;
 import org.jetbrains.jet.utils.PathUtil;
 import org.jetbrains.jet.utils.serializer.Serializer;
 import org.jetbrains.k2js.analyze.TopDownAnalyzerFacadeForJS;
 import org.jetbrains.k2js.config.*;
 import org.jetbrains.k2js.facade.MainCallParameters;
 import org.jetbrains.k2js.facade.Status;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.List;
@@ -189,7 +191,10 @@ public class K2JSCompiler extends CLICompiler<K2JSCompilerArguments> {
             File metaFile = new File(arguments.metaInfo);
             ModuleDescriptor moduleDescriptor = analysisResult.getModuleDescriptor();
             Serializer serializer = new Serializer();
-            serializer.serialize(moduleDescriptor, sourcesFiles, metaFile);
+            String moduleName = config.getModuleId();
+            JSONObject descriptors = new JSONObject();
+            serializer.serialize(moduleDescriptor, sourcesFiles, descriptors);
+            LibraryUtils.writeMetadata(moduleName, descriptors, metaFile);
         }
 
         return OK;
