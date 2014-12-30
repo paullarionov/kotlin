@@ -28,6 +28,7 @@ import java.util.jar.JarFile
 import java.util.jar.Manifest
 import java.util.zip.ZipFile
 import kotlin.platform.platformStatic
+import org.json.JSONObject
 
 public object LibraryUtils {
     private val LOG = Logger.getInstance(javaClass<LibraryUtils>())
@@ -40,6 +41,7 @@ public object LibraryUtils {
     private val MANIFEST_PATH = "${METAINF}MANIFEST.MF"
     private val METAINF_RESOURCES = "${METAINF}resources/"
     private val KOTLIN_JS_MODULE_ATTRIBUTE_NAME = Attributes.Name(KOTLIN_JS_MODULE_NAME);
+    private val DESCRIPTORS_NAME = "descriptors"
 
     {
         var jsStdLib = ""
@@ -105,6 +107,15 @@ public object LibraryUtils {
                 copyJsFilesFromZip(file, outputLibraryJsPath)
             }
         }
+    }
+
+    platformStatic
+    public fun writeMetadata(moduleName: String, descriptors: JSONObject, file: File) {
+        val result = JSONObject()
+        result.put(KOTLIN_JS_MODULE_NAME, moduleName)
+        result.put(Attributes.Name.SPECIFICATION_TITLE.toString(), TITLE_KOTLIN_JAVASCRIPT_LIB)
+        result.put(DESCRIPTORS_NAME, descriptors)
+        FileUtil.writeToFile(file, result.toString())
     }
 
     private fun copyJsFilesFromDirectory(dir: File, outputLibraryJsPath: String) {
