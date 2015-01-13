@@ -119,7 +119,7 @@ public class MoveKotlinTopLevelDeclarationsProcessor(
         val newPackageName = options.moveTarget.packageWrapper?.getQualifiedName() ?: ""
 
         fun collectUsages(): List<UsageInfo> {
-            return kotlinToLightElements.values().flatten().flatMap { lightElement ->
+            return kotlinToLightElements.values().flatMap { it }.flatMap { lightElement ->
                 val newFqName = StringUtil.getQualifiedName(newPackageName, lightElement.getName())
 
                 val foundReferences = HashSet<PsiReference>()
