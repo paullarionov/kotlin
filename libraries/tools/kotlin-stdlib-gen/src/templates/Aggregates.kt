@@ -103,6 +103,38 @@ fun aggregates(): List<GenericFunction> {
         }
     }
 
+    templates add f("sumBy(transform: (T) -> Int)") {
+        inline(true)
+        doc { "Returns the sum of all values produced by `transform` function from elements in the collection" }
+        returns("Int")
+        body {
+            """
+            val iterator = iterator()
+            var sum: Int = 0
+            while (iterator.hasNext()) {
+                sum += transform(iterator.next())
+            }
+            return sum
+            """
+        }
+    }
+
+    templates add f("sumByDouble(transform: (T) -> Double)") {
+        inline(true)
+        doc { "Returns the sum of all values produced by `transform` function from elements in the collection" }
+        returns("Double")
+        body {
+            """
+            val iterator = iterator()
+            var sum: Double = 0.0
+            while (iterator.hasNext()) {
+                sum += transform(iterator.next())
+            }
+            return sum
+            """
+        }
+    }
+
     templates add f("min()") {
         doc { "Returns the smallest element or null if there are no elements" }
         returns("T?")

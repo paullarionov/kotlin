@@ -2242,3 +2242,291 @@ public inline fun String.reduceRight(operation: (Char, Char) -> Char): Char {
     return accumulator
 }
 
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun <T> Array<out T>.sumBy(transform: (T) -> Int): Int {
+    val iterator = iterator()
+    var sum: Int = 0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun BooleanArray.sumBy(transform: (Boolean) -> Int): Int {
+    val iterator = iterator()
+    var sum: Int = 0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun ByteArray.sumBy(transform: (Byte) -> Int): Int {
+    val iterator = iterator()
+    var sum: Int = 0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun CharArray.sumBy(transform: (Char) -> Int): Int {
+    val iterator = iterator()
+    var sum: Int = 0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun DoubleArray.sumBy(transform: (Double) -> Int): Int {
+    val iterator = iterator()
+    var sum: Int = 0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun FloatArray.sumBy(transform: (Float) -> Int): Int {
+    val iterator = iterator()
+    var sum: Int = 0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun IntArray.sumBy(transform: (Int) -> Int): Int {
+    val iterator = iterator()
+    var sum: Int = 0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun LongArray.sumBy(transform: (Long) -> Int): Int {
+    val iterator = iterator()
+    var sum: Int = 0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun ShortArray.sumBy(transform: (Short) -> Int): Int {
+    val iterator = iterator()
+    var sum: Int = 0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun <T> Iterable<T>.sumBy(transform: (T) -> Int): Int {
+    val iterator = iterator()
+    var sum: Int = 0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun <T> Stream<T>.sumBy(transform: (T) -> Int): Int {
+    val iterator = iterator()
+    var sum: Int = 0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun String.sumBy(transform: (Char) -> Int): Int {
+    val iterator = iterator()
+    var sum: Int = 0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun <T> Array<out T>.sumByDouble(transform: (T) -> Double): Double {
+    val iterator = iterator()
+    var sum: Double = 0.0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun BooleanArray.sumByDouble(transform: (Boolean) -> Double): Double {
+    val iterator = iterator()
+    var sum: Double = 0.0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun ByteArray.sumByDouble(transform: (Byte) -> Double): Double {
+    val iterator = iterator()
+    var sum: Double = 0.0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun CharArray.sumByDouble(transform: (Char) -> Double): Double {
+    val iterator = iterator()
+    var sum: Double = 0.0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun DoubleArray.sumByDouble(transform: (Double) -> Double): Double {
+    val iterator = iterator()
+    var sum: Double = 0.0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun FloatArray.sumByDouble(transform: (Float) -> Double): Double {
+    val iterator = iterator()
+    var sum: Double = 0.0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun IntArray.sumByDouble(transform: (Int) -> Double): Double {
+    val iterator = iterator()
+    var sum: Double = 0.0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun LongArray.sumByDouble(transform: (Long) -> Double): Double {
+    val iterator = iterator()
+    var sum: Double = 0.0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun ShortArray.sumByDouble(transform: (Short) -> Double): Double {
+    val iterator = iterator()
+    var sum: Double = 0.0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun <T> Iterable<T>.sumByDouble(transform: (T) -> Double): Double {
+    val iterator = iterator()
+    var sum: Double = 0.0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun <T> Stream<T>.sumByDouble(transform: (T) -> Double): Double {
+    val iterator = iterator()
+    var sum: Double = 0.0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
+/**
+ * Returns the sum of all values produced by `transform` function from elements in the collection
+ */
+public inline fun String.sumByDouble(transform: (Char) -> Double): Double {
+    val iterator = iterator()
+    var sum: Double = 0.0
+    while (iterator.hasNext()) {
+        sum += transform(iterator.next())
+    }
+    return sum
+}
+
