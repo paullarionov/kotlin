@@ -36,8 +36,6 @@ public class PluginStartupComponent implements ApplicationComponent {
     public void initComponent() {
         registerPathVariable();
         QuickFixRegistrar.registerQuickFixes();
-
-        FilterPackage.addKotlinStdlibDebugFilterIfNeeded();
     }
 
     private static void registerPathVariable() {

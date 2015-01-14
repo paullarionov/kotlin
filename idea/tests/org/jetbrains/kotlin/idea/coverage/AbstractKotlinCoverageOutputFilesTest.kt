@@ -15,6 +15,8 @@
  */
 
 package org.jetbrains.kotlin.idea.coverage
+/*
+No coverage in Idea 13
 
 import org.jetbrains.kotlin.idea.JetLightCodeInsightFixtureTestCase
 import org.jetbrains.kotlin.idea.PluginTestCaseBase
@@ -62,3 +64,5 @@ private fun createEmptyFile(dir: VirtualFile, relativePath: String) {
         }
     }
 }
+
+*/
