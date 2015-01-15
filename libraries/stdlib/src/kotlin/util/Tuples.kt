@@ -29,7 +29,7 @@ public data class Pair<out A, out B>(
 /**
  * Converts pair into a list
  */
-fun <T> Pair<T, T>.toList() = listOf(first, second)
+public fun <T> Pair<T, T>.toList(): List<T> = listOf(first, second)
 
 /**
  * Represents a triad of values
@@ -58,4 +58,4 @@ public data class Triple<out A, out B, out C>(
 /**
  * Converts triple into a list
  */
-fun <T> Triple<T, T, T>.toList() = listOf(first, second, third)
+public fun <T> Triple<T, T, T>.toList(): List<T> = listOf(first, second, third)
