@@ -79,9 +79,7 @@ public fun findReferencedVars(
     }
 
     val limit = calculateLimitRange(positionFile, doc, line)
-
-    var startLine = Math.max(limit.getStartOffset(), line - 1)
-    startLine = Math.min(startLine, limit.getEndOffset())
+    var startLine: Int = /*listOf(limit.getStartOffset(), 1).min()!!*/ Math.min(Math.max(limit.getStartOffset(), line - 1), limit.getEndOffset())
     while (startLine > limit.getStartOffset() && shouldSkipLine(positionFile, doc, startLine)) {
         startLine--
     }
@@ -116,13 +114,10 @@ public fun findReferencedVars(
 private fun calculateLimitRange(file: PsiFile, doc: Document, line: Int): TextRange {
     val offset = doc.getLineStartOffset(line)
     if (offset > 0) {
-        var elem = file.findElementAt(offset)
-        while (elem != null) {
-            if (elem is JetDeclaration) {
-                val elemRange = elem!!.getTextRange()
-                return TextRange(doc.getLineNumber(elemRange.getStartOffset()), doc.getLineNumber(elemRange.getEndOffset()))
-            }
-            elem = elem!!.getParent()
+        val element = file.findElementAt(offset)
+        if (element != null) {
+            val contDeclaration: JetDeclaration = PsiTreeUtil.getNonStrictParentOfType(element, javaClass())
+            return contDeclaration.getTextRange()
         }
     }
     return TextRange(0, doc.getLineCount() - 1)

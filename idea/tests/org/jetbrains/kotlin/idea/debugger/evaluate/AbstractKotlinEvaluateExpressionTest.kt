@@ -221,6 +221,7 @@ public abstract class AbstractKotlinEvaluateExpressionTest : KotlinDebuggerTestB
 
         val debuggerContext = createDebuggerContext(this)
         invokeRatherLater(this) {
+            tree.setAutoVariablesMode(true)
             tree.rebuild(debuggerContext)
             expandAll(tree, Runnable {
                 try {
